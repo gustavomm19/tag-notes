@@ -8,7 +8,11 @@ export class NotesService {
   constructor(private readonly prisma: PrismaService) {}
 
   getNotes() {
-    return this.prisma.notes.findMany();
+    return this.prisma.notes.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
   }
 
   async createNote(dto: CreateNoteDto) {
