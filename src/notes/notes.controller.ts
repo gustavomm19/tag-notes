@@ -47,4 +47,9 @@ export class NotesController {
   deleteNote(@Param('id', ParseIntPipe) noteId: number) {
     return this.notesService.deleteNote(noteId);
   }
+
+  @Post('/faker')
+  createRandomNotes() {
+    return this.notesService.createRandomNotes();
+  }
 }

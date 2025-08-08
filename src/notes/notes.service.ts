@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { faker } from '@faker-js/faker';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateNoteDto } from './dto/update-note.dto';
@@ -97,5 +98,35 @@ export class NotesService {
         id: noteId,
       },
     });
+  }
+
+  async createRandomNotes() {
+    const tags = faker.helpers.multiple(() => faker.lorem.word(), {
+      count: 5,
+    });
+
+    function createRandomNote() {
+      return {
+        title: faker.lorem.words({ min: 1, max: 3 }),
+        description: faker.lorem.words({ min: 5, max: 25 }),
+        // tags: {
+        //   connectOrCreate: tags
+        //     .slice(0, Math.floor(Math.random() * 5 + 1))
+        //     .map((tag) => ({
+        //       where: { name: tag },
+        //       create: { name: tag },
+        //     })),
+        // },
+      };
+    }
+
+    const notes = faker.helpers.multiple(createRandomNote, {
+      count: 1,
+    });
+
+    const results = await this.prisma.notes.createMany({
+      data: notes,
+    });
+    return results;
   }
 }
