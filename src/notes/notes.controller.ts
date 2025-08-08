@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { NotesService } from './notes.service';
 import { CreateNoteDto } from './dto/create-note.dto';
@@ -21,8 +22,11 @@ import { AuthGuard } from 'src/auth/guard';
 export class NotesController {
   constructor(private readonly notesService: NotesService) {}
   @Get()
-  getNotes() {
-    return this.notesService.getNotes();
+  getNotes(@Query('tags') tags?: string) {
+    const tagArray = tags
+      ? tags.split(',').map((tag) => tag.trim())
+      : undefined;
+    return this.notesService.getNotes(tagArray);
   }
 
   @Post()

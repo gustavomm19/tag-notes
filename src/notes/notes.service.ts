@@ -7,10 +7,23 @@ import { UpdateNoteDto } from './dto/update-note.dto';
 export class NotesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  getNotes() {
+  getNotes(tags?: string[]) {
     return this.prisma.notes.findMany({
       orderBy: {
         createdAt: 'desc',
+      },
+      where: {
+        ...(tags && tags.length > 0
+          ? {
+              tags: {
+                some: {
+                  name: {
+                    in: tags,
+                  },
+                },
+              },
+            }
+          : {}),
       },
       include: { tags: true },
     });
