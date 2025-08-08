@@ -12,17 +12,31 @@ export class NotesService {
       orderBy: {
         createdAt: 'desc',
       },
+      include: { tags: true },
     });
   }
 
   async createNote(dto: CreateNoteDto) {
+    const { tags, ...data } = dto;
     const note = await this.prisma.notes.create({
-      data: dto,
+      data: {
+        ...data,
+        tags: tags?.length
+          ? {
+              connectOrCreate: tags.map((tag) => ({
+                where: { name: tag },
+                create: { name: tag },
+              })),
+            }
+          : undefined,
+      },
+      include: { tags: true },
     });
     return note;
   }
 
   async updateNote(noteId: number, dto: UpdateNoteDto) {
+    const { tags, ...data } = dto;
     const note = await this.prisma.notes.findUnique({
       where: {
         id: noteId,
@@ -37,7 +51,18 @@ export class NotesService {
       where: {
         id: noteId,
       },
-      data: dto,
+      data: {
+        ...data,
+        tags: tags?.length
+          ? {
+              connectOrCreate: tags.map((tag) => ({
+                where: { name: tag },
+                create: { name: tag },
+              })),
+            }
+          : undefined,
+      },
+      include: { tags: true },
     });
 
     return updatedNote;

@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsString, IsOptional, IsArray } from 'class-validator';
 
 export class CreateNoteDto {
   @IsString()
@@ -6,4 +6,9 @@ export class CreateNoteDto {
 
   @IsString()
   description: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  tags: string[];
 }
