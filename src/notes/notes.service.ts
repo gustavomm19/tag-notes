@@ -82,6 +82,8 @@ export class NotesService {
   }
 
   async createRandomNotes() {
+    const limit = 20;
+
     const tags = faker.helpers.multiple(() => faker.lorem.word(), {
       count: 5,
     });
@@ -95,12 +97,19 @@ export class NotesService {
     }
 
     const notes = faker.helpers.multiple(createRandomNote, {
-      count: 5,
+      count: limit,
     });
 
-    const results = await this.prisma.notes.createMany({
+    await this.prisma.notes.createMany({
       data: notes,
     });
-    return { result: `${results.count} notes generated successfully` };
+
+    const result = await this.prisma.notes.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: limit,
+    });
+    return result;
   }
 }
