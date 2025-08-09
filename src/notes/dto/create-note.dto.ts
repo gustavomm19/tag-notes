@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Transform } from 'class-transformer';
 import { IsString, IsOptional, IsArray } from 'class-validator';
 
 export class CreateNoteDto {
@@ -7,8 +9,8 @@ export class CreateNoteDto {
   @IsString()
   description: string;
 
-  @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  tags: string[];
+  @IsOptional()
+  tags?: string[];
 }

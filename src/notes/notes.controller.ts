@@ -22,11 +22,11 @@ import { AuthGuard } from 'src/auth/guard';
 export class NotesController {
   constructor(private readonly notesService: NotesService) {}
   @Get()
-  getNotes(@Query('tags') tags?: string) {
-    const tagArray = tags
-      ? tags.split(',').map((tag) => tag.trim())
-      : undefined;
-    return this.notesService.getNotes(tagArray);
+  getNotes(@Query('tag') tag: string) {
+    // const tagArray = tags
+    //   ? tags.split(',').map((tag) => tag.trim())
+    //   : undefined;
+    return this.notesService.getNotes(tag);
   }
 
   @Post()

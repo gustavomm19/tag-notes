@@ -8,49 +8,38 @@ import { UpdateNoteDto } from './dto/update-note.dto';
 export class NotesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  getNotes(tags?: string[]) {
-    return this.prisma.notes.findMany({
+  async getNotes(tag: string) {
+    const notes = await this.prisma.notes.findMany({
       orderBy: {
         createdAt: 'desc',
       },
-      where: {
-        ...(tags && tags.length > 0
-          ? {
-              tags: {
-                some: {
-                  name: {
-                    in: tags,
-                  },
-                },
-              },
-            }
-          : {}),
-      },
-      include: { tags: true },
+      where: tag
+        ? {
+            tags: {
+              contains: tag.toLowerCase(),
+            },
+          }
+        : {},
     });
+
+    return notes;
   }
 
   async createNote(dto: CreateNoteDto) {
     const { tags, ...data } = dto;
+    const joinedTags = tags?.join(',').toUpperCase() || '';
     const note = await this.prisma.notes.create({
       data: {
         ...data,
-        tags: tags?.length
-          ? {
-              connectOrCreate: tags.map((tag) => ({
-                where: { name: tag },
-                create: { name: tag },
-              })),
-            }
-          : undefined,
+        tags: joinedTags,
       },
-      include: { tags: true },
     });
     return note;
   }
 
   async updateNote(noteId: number, dto: UpdateNoteDto) {
     const { tags, ...data } = dto;
+    const joinedTags = tags?.join(',').toUpperCase() || '';
     const note = await this.prisma.notes.findUnique({
       where: {
         id: noteId,
@@ -67,16 +56,8 @@ export class NotesService {
       },
       data: {
         ...data,
-        tags: tags?.length
-          ? {
-              connectOrCreate: tags.map((tag) => ({
-                where: { name: tag },
-                create: { name: tag },
-              })),
-            }
-          : undefined,
+        tags: joinedTags,
       },
-      include: { tags: true },
     });
 
     return updatedNote;
@@ -109,24 +90,17 @@ export class NotesService {
       return {
         title: faker.lorem.words({ min: 1, max: 3 }),
         description: faker.lorem.words({ min: 5, max: 25 }),
-        // tags: {
-        //   connectOrCreate: tags
-        //     .slice(0, Math.floor(Math.random() * 5 + 1))
-        //     .map((tag) => ({
-        //       where: { name: tag },
-        //       create: { name: tag },
-        //     })),
-        // },
+        tags: tags.slice(0, Math.floor(Math.random() * 5 + 1)).join(','),
       };
     }
 
     const notes = faker.helpers.multiple(createRandomNote, {
-      count: 1,
+      count: 5,
     });
 
     const results = await this.prisma.notes.createMany({
       data: notes,
     });
-    return results;
+    return { result: `${results.count} notes generated successfully` };
   }
 }
