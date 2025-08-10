@@ -1,8 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { faker } from '@faker-js/faker';
+import { plainToInstance } from 'class-transformer';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateNoteDto } from './dto/update-note.dto';
+import { GetNoteDto } from './dto/get-note.dto';
 
 @Injectable()
 export class NotesService {
@@ -22,24 +24,24 @@ export class NotesService {
         : {},
     });
 
-    return notes;
+    return plainToInstance(GetNoteDto, notes);
   }
 
   async createNote(dto: CreateNoteDto) {
     const { tags, ...data } = dto;
-    const joinedTags = tags?.join(',').toUpperCase() || '';
+    const joinedTags = tags?.join(',').toLowerCase() || '';
     const note = await this.prisma.notes.create({
       data: {
         ...data,
         tags: joinedTags,
       },
     });
-    return note;
+    return plainToInstance(GetNoteDto, note);
   }
 
   async updateNote(noteId: number, dto: UpdateNoteDto) {
     const { tags, ...data } = dto;
-    const joinedTags = tags?.join(',').toUpperCase() || '';
+    const joinedTags = tags?.join(',').toLowerCase() || '';
     const note = await this.prisma.notes.findUnique({
       where: {
         id: noteId,
@@ -60,7 +62,7 @@ export class NotesService {
       },
     });
 
-    return updatedNote;
+    return plainToInstance(GetNoteDto, updatedNote);
   }
 
   async deleteNote(noteId: number) {
@@ -110,6 +112,6 @@ export class NotesService {
       },
       take: limit,
     });
-    return result;
+    return plainToInstance(GetNoteDto, result);
   }
 }

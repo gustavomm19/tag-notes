@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString } from 'class-validator';
+import { IsArray, IsNumber, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class GetNoteDto {
   @IsNumber()
@@ -23,12 +24,21 @@ export class GetNoteDto {
   })
   description: string;
 
-  @IsString()
+  @IsArray()
+  @IsString({ each: true })
+  @Transform(({ value }) =>
+    typeof value === 'string'
+      ? value
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter((tag) => tag)
+      : value,
+  )
   @ApiProperty({
     description: 'The tags of the note',
     required: true,
   })
-  tags: string;
+  tags: string[];
 
   @IsString()
   @ApiProperty({
