@@ -25,4 +25,5 @@ $ npx prisma migrate dev
 ```bash
 $ npm run start
 ```
-
+## Documentation
+localhost:3000/api
