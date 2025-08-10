@@ -4,17 +4,19 @@ An API powered in NestJS to store and manage notes with tags.
 
 ## Project setup
 
-1. ```bash
+1. Install the dependencies
+```bash
 $ npm install
 ```
 
 2. Create an .env file with the content of the .env.example file.
 
-3. ```bash
+3. Generate the prisma client
+```bash
 $ npx prisma generate
 ```
-
-4.```bash
+4. Migrate the database
+```bash
 $ npx prisma migrate dev
 ```
 
